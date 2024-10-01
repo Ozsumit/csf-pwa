@@ -2,15 +2,15 @@ import withPWA from "next-pwa";
 
 const config = {
   reactStrictMode: true,
-  output: "export", // Injected property
+  output: "export",
 };
 
 const nextConfig = withPWA({
   dest: "public",
-  //   disable: process.env.NODE_ENV === "development",
   register: true,
   skipWaiting: true,
-  sw: "/service-worker.ts",
+  // Remove the sw property for now
+  // sw: "/service-worker.ts",
 })(config);
 
 export default nextConfig;
