@@ -1,4 +1,3 @@
-// service-worker.ts
 import {
   CacheFirst,
   NetworkFirst,
@@ -8,7 +7,7 @@ import { registerRoute } from "workbox-routing";
 import { CacheableResponsePlugin } from "workbox-cacheable-response";
 import { ExpirationPlugin } from "workbox-expiration";
 
-declare const self: ServiceWorkerGlobalScope;
+declare const self: ServiceWorkerGlobalScope; // Ensure TypeScript recognizes 'self'
 
 // Cache the Google Fonts stylesheets with a stale-while-revalidate strategy.
 registerRoute(
@@ -28,7 +27,7 @@ registerRoute(
         statuses: [0, 200],
       }),
       new ExpirationPlugin({
-        maxAgeSeconds: 60 * 60 * 24 * 365,
+        maxAgeSeconds: 60 * 60 * 24 * 365, // 1 Year
         maxEntries: 30,
       }),
     ],
@@ -74,25 +73,31 @@ registerRoute(
   })
 );
 
-// Listen for the install event and precache the essential resources
-self.addEventListener("install", (event) => {
+// Listen for the install event and precache the essential resourcesself.addEventListener("install", (event: ExtendableEvent) => {
+self.addEventListener("install", (event: ExtendableEvent) => {
   event.waitUntil(
     caches.open("offline-fallback").then((cache) => {
       return cache.addAll([
-        "/offline",
-        "/styles/offline.css",
-        "/images/offline-image.png",
+        "/offline", // Your offline fallback page
+        "/styles/offline.css", // Offline stylesheet
+        "/images/offline-image.png", // Offline image
       ]);
     })
   );
 });
 
-// Serve the offline page when there's a network failure
-self.addEventListener("fetch", (event) => {
+self.addEventListener("fetch", (event: FetchEvent) => {
   if (event.request.mode === "navigate") {
     event.respondWith(
-      fetch(event.request).catch(() => {
-        return caches.match("/offline");
+      fetch(event.request).catch(async () => {
+        const cachedResponse = await caches.match("/offline");
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+        return new Response("Offline page not available", {
+          status: 503,
+          statusText: "Service Unavailable",
+        });
       })
     );
   }
