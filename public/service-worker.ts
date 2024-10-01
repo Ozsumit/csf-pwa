@@ -65,9 +65,8 @@ registerRoute(
   })
 );
 
-// Default to network-first strategy for everything else
 registerRoute(
-  ({ url }) => true,
+  () => true, // Catch-all route for everything
   new NetworkFirst({
     cacheName: "default",
   })
